@@ -1,5 +1,21 @@
 # ddd-ai
 
+## Prototype
+
+Fahrrad-Sharing Prototype — gebaut aus Domain Story, Visual Glossary und SIXT-Style:
+
+```
+prototype/index.html
+```
+
+Im Browser öffnen. Der **Rollen-Switcher** oben rechts wechselt zwischen:
+- **Commuter** — Subscription buchen, Fahrrad suchen/reservieren/übernehmen/zurückgeben
+- **Customer Care Specialist** — Bestätigungen senden, Flotte verwalten
+
+Der **Reservierer** ist als sichtbares Software-System im Buchungsflow modelliert (Overlay mit Systemstatus).
+
+---
+
 ## Ressourcen
 
 ### Miro Board
