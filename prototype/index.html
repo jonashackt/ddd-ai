@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fahrrad-Sharing Prototype</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  /* ── Token Layer (aus sixt_style.json) ── */
+  :root {
+    --color-primary:        #FF5000;
+    --color-primary-dark:   #5E2A12;
+    --color-bg:             #FFFFFF;
+    --color-bg-dark:        #141414;
+    --color-surface:        #191919;
+    --color-bg-subtle:      #FEF2EB;
+    --color-text:           #222222;
+    --color-text-muted:     #5E5E5E;
+    --color-text-on-dark:   #FFFFFF;
+    --color-border:         #5E5E5E;
+    --color-border-light:   #E5E5E5;
+
+    --font-family: system-ui, -apple-system, sans-serif;
+    --font-size-xs:   12px;
+    --font-size-sm:   14px;
+    --font-size-base: 16px;
+    --font-size-lg:   20px;
+    --font-size-xl:   24px;
+
+    --space-1:  4px;
+    --space-2:  8px;
+    --space-3:  12px;
+    --space-4:  16px;
+    --space-6:  24px;
+    --space-8:  32px;
+    --space-12: 48px;
+
+    --radius-sm:  4px;
+    --radius-md:  8px;
+    --radius-pill: 20px;
+
+    --btn-height: 44px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    background: var(--color-bg);
+    min-height: 100vh;
+  }
+
+  /* ── Announcement Bar ── */
+  .announcement-bar {
+    background: var(--color-primary-dark);
+    color: var(--color-text-on-dark);
+    font-weight: 700;
+    font-size: var(--font-size-xs);
+    text-align: center;
+    padding: 10px var(--space-4);
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Navbar ── */
+  .navbar {
+    background: var(--color-bg-dark);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-8);
+  }
+  .navbar-logo {
+    color: var(--color-text-on-dark);
+    font-size: var(--font-size-xl);
+    font-weight: 900;
+    letter-spacing: -1px;
+  }
+  .navbar-logo span { color: var(--color-primary); }
+  .navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+  .navbar-link {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: var(--font-family);
+  }
+  .navbar-link:hover { color: var(--color-text-on-dark); }
+
+  /* ── Role Switcher ── */
+  .role-switcher {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-surface);
+    border-radius: var(--radius-pill);
+    padding: var(--space-1) var(--space-2);
+  }
+  .role-chip {
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-family);
+  }
+  .role-chip.active {
+    background: var(--color-primary);
+    color: var(--color-text-on-dark);
+  }
+
+  /* ── Sub-Nav ── */
+  .sub-nav {
+    background: var(--color-surface);
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-8);
+    gap: var(--space-4);
+  }
+  .sub-nav-item {
+    padding: 6px var(--space-4);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-family);
+  }
+  .sub-nav-item.active {
+    background: var(--color-bg-dark);
+    color: var(--color-text-on-dark);
+    border-color: #353535;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    height: var(--btn-height);
+    padding: 0 var(--space-6);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    font-family: var(--font-family);
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-text-on-dark);
+  }
+  .btn-primary:hover { background: #e04800; }
+  .btn-secondary {
+    background: var(--color-bg);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+  }
+  .btn-secondary:hover { background: var(--color-bg-subtle); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-primary);
+    border: none;
+  }
+  .btn-sm { height: 36px; padding: 0 var(--space-4); font-size: var(--font-size-xs); }
+
+  /* ── Status Badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+  }
+  .badge-verfügbar  { background: #d4edda; color: #1a5c2a; }
+  .badge-blockiert  { background: #fff3cd; color: #7d5a00; }
+  .badge-ausgeliehen { background: #cce5ff; color: #0050a0; }
+  .badge-zurückgegeben { background: #e2e3e5; color: #383d41; }
+
+  /* ── Page Layout ── */
+  .page { padding: var(--space-8); max-width: 1100px; margin: 0 auto; }
+  .page-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-6);
+  }
+  .page-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+  }
+  .card + .card { margin-top: var(--space-4); }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-4);
+  }
+  .card-title { font-weight: 700; font-size: var(--font-size-base); }
+  .card-meta { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 4px; }
+
+  .card-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-4); }
+
+  /* ── Grid ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4); }
+
+  /* ── Forms ── */
+  .form-group { margin-bottom: var(--space-4); }
+  .form-label {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    height: var(--btn-height);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-family: var(--font-family);
+    color: var(--color-text);
+    background: var(--color-bg);
+  }
+  .form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  /* ── Info Bar ── */
+  .info-bar {
+    background: var(--color-bg-subtle);
+    border-left: 3px solid var(--color-primary);
+    padding: var(--space-3) var(--space-4);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-6);
+  }
+
+  /* ── Subscription Card ── */
+  .subscription-plan {
+    border: 2px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .subscription-plan.selected {
+    border-color: var(--color-primary);
+    background: var(--color-bg-subtle);
+  }
+  .plan-price {
+    font-size: var(--font-size-xl);
+    font-weight: 900;
+    color: var(--color-primary);
+    margin: var(--space-2) 0;
+  }
+  .plan-name { font-weight: 700; font-size: var(--font-size-base); }
+  .plan-desc { color: var(--color-text-muted); font-size: var(--font-size-xs); }
+
+  /* ── Reservierer ── */
+  .reservierer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .reservierer-card {
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    padding: var(--space-8);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+  }
+  .reservierer-spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--color-border-light);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    margin: 0 auto var(--space-4);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .reservierer-label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--space-2);
+  }
+  .reservierer-system-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-surface);
+    color: var(--color-text-on-dark);
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+  }
+  .reservierer-dot {
+    width: 8px; height: 8px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── Bike Map Placeholder ── */
+  .bike-map {
+    background: #e8f0e8;
+    border-radius: var(--radius-md);
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-border-light);
+  }
+
+  /* ── Success / Confirmation ── */
+  .confirmation-icon {
+    width: 64px; height: 64px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin: 0 auto var(--space-4);
+  }
+  .confirmation-box {
+    text-align: center;
+    padding: var(--space-12) var(--space-8);
+  }
+
+  /* ── Divider ── */
+  hr { border: none; border-top: 1px solid var(--color-border-light); margin: var(--space-4) 0; }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs); font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; border-bottom: 2px solid var(--color-border-light); }
+  td { padding: var(--space-3); font-size: var(--font-size-sm); border-bottom: 1px solid var(--color-border-light); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ── Seed-Daten (glossary-konform) ── */
+const INITIAL_FAHRRÄDER = [
+  { id: 'F001', typ: 'City Bike', rack: 'Rack Hauptbahnhof', standort: 'Bahnhofsplatz 1', status: 'verfügbar', commuterId: null },
+  { id: 'F002', typ: 'E-Bike',    rack: 'Rack Marktplatz',   standort: 'Marktplatz 4',    status: 'blockiert',  commuterId: 'C001' },
+  { id: 'F003', typ: 'City Bike', rack: 'Rack Universität',  standort: 'Uni-Allee 12',    status: 'ausgeliehen', commuterId: 'C002' },
+  { id: 'F004', typ: 'Lastenrad', rack: 'Rack Hauptbahnhof', standort: 'Bahnhofsplatz 1', status: 'zurückgegeben', commuterId: null },
+  { id: 'F005', typ: 'E-Bike',    rack: 'Rack Marktplatz',   standort: 'Marktplatz 4',    status: 'verfügbar', commuterId: null },
+  { id: 'F006', typ: 'City Bike', rack: 'Rack Universität',  standort: 'Uni-Allee 12',    status: 'verfügbar', commuterId: null },
+];
+
+const INITIAL_SUBSCRIPTIONS = [
+  { id: 'S001', commuterId: 'C001', planType: 'Monatlich', status: 'bestätigt', startDate: '2026-09-01' },
+];
+
+const COMMUTER_ID = 'C_ME';
+
+/* ── Badge Component ── */
+function StatusBadge({ status }) {
+  return <span className={`badge badge-${status}`}>{status}</span>;
+}
+
+/* ── Navbar ── */
+function Navbar({ role, setRole }) {
+  return (
+    <>
+      <div className="announcement-bar">Fahrrad-Sharing — Premium Mobilität. Weltweit.</div>
+      <nav className="navbar">
+        <div className="navbar-logo">FA<span>X</span>T Bikes</div>
+        <div className="navbar-actions">
+          <div className="role-switcher">
+            <span style={{color:'#999', fontSize:'11px', marginRight:4}}>Rolle:</span>
+            {['Commuter','Customer Care Specialist'].map(r => (
+              <button key={r} className={`role-chip ${role===r?'active':''}`} onClick={()=>setRole(r)}>
+                {r === 'Customer Care Specialist' ? 'CCS' : r}
+              </button>
+            ))}
+          </div>
+          <button className="navbar-link">Buchungen verwalten</button>
+          <button className="navbar-link">Anmelden | Registrieren</button>
+        </div>
+      </nav>
+    </>
+  );
+}
+
+/* ── Sub-Nav ── */
+function SubNav({ screen, setScreen, role }) {
+  const commuterScreens = [
+    { id: 'home',          label: 'Übersicht' },
+    { id: 'subscription',  label: 'Subscription' },
+    { id: 'fahrrad-suche', label: 'Fahrrad suchen' },
+    { id: 'meine-fahrten', label: 'Meine Fahrten' },
+  ];
+  const ccsScreens = [
+    { id: 'ccs-dashboard',     label: 'Dashboard' },
+    { id: 'ccs-bestätigungen', label: 'Bestätigungen' },
+    { id: 'ccs-flotte',        label: 'Flotte' },
+  ];
+  const items = role === 'Commuter' ? commuterScreens : ccsScreens;
+  return (
+    <div className="sub-nav">
+      {items.map(i => (
+        <button key={i.id} className={`sub-nav-item ${screen===i.id?'active':''}`} onClick={()=>setScreen(i.id)}>
+          {i.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ════════════════════════════════
+   COMMUTER SCREENS
+════════════════════════════════ */
+
+/* Übersicht */
+function ScreenHome({ subscription, setScreen }) {
+  return (
+    <div className="page">
+      <div className="page-title">Willkommen beim Fahrrad-Sharing</div>
+      {!subscription ? (
+        <div className="info-bar">
+          Du hast noch keine aktive Subscription. <button className="btn-ghost btn" style={{height:'auto',padding:'0 8px'}} onClick={()=>setScreen('subscription')}>Jetzt buchen →</button>
+        </div>
+      ) : (
+        <div className="info-bar">
+          ✓ Deine Subscription ist aktiv ({subscription.planType}) — du kannst Fahrräder buchen.
+        </div>
+      )}
+      <div className="grid-3" style={{marginTop: 24}}>
+        {[
+          { icon: '🚲', title: 'Fahrrad suchen', desc: 'Verfügbare Fahrräder in deiner Nähe finden', screen: 'fahrrad-suche' },
+          { icon: '📋', title: 'Subscription', desc: 'Dein Abonnement verwalten', screen: 'subscription' },
+          { icon: '🗓️', title: 'Meine Fahrten', desc: 'Übersicht deiner bisherigen Fahrten', screen: 'meine-fahrten' },
+        ].map(t => (
+          <div key={t.screen} className="card" style={{cursor:'pointer'}} onClick={()=>setScreen(t.screen)}>
+            <div style={{fontSize:32, marginBottom:12}}>{t.icon}</div>
+            <div className="card-title">{t.title}</div>
+            <div className="card-meta" style={{marginTop:4}}>{t.desc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* Subscription buchen */
+function ScreenSubscription({ subscription, setSubscription, setScreen }) {
+  const [selectedPlan, setSelectedPlan] = useState('Monatlich');
+
+  const plans = [
+    { type: 'Monatlich', preis: '29,90 €/Monat', desc: 'Flexibel kündbar, unlimitierte Fahrten' },
+    { type: 'Jährlich',  preis: '19,90 €/Monat', desc: '12 Monate, 33% Ersparnis' },
+  ];
+
+  if (subscription) {
+    return (
+      <div className="page">
+        <div className="page-title">Deine Subscription</div>
+        <div className="card">
+          <div className="card-header">
+            <div>
+              <div className="card-title">Plan: {subscription.planType}</div>
+              <div className="card-meta">Aktiv seit {subscription.startDate}</div>
+            </div>
+            <StatusBadge status={subscription.status} />
+          </div>
+          <div className="card-actions">
+            <button className="btn btn-secondary btn-sm" onClick={()=>setSubscription(null)}>Subscription kündigen</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page">
+      <div className="page-title">Subscription buchen</div>
+      <p className="page-subtitle">Wähle deinen Plan und starte deine Fahrrad-Sharing-Mitgliedschaft.</p>
+      <div className="grid-2" style={{marginBottom: 24}}>
+        {plans.map(p => (
+          <div key={p.type} className={`subscription-plan ${selectedPlan===p.type?'selected':''}`} onClick={()=>setSelectedPlan(p.type)}>
+            <div className="plan-name">{p.type}</div>
+            <div className="plan-price">{p.preis}</div>
+            <div className="plan-desc">{p.desc}</div>
+          </div>
+        ))}
+      </div>
+      <div className="form-group">
+        <label className="form-label">Zahlungsmethode</label>
+        <select className="form-select">
+          <option>Kreditkarte</option>
+          <option>PayPal</option>
+          <option>SEPA-Lastschrift</option>
+        </select>
+      </div>
+      <button className="btn btn-primary" onClick={()=>{
+        setSubscription({ id:'S_NEW', commuterId: COMMUTER_ID, planType: selectedPlan, status:'gebucht', startDate:'2026-10-02' });
+        setScreen('bestätigung-pending');
+      }}>
+        Subscription buchen
+      </button>
+    </div>
+  );
+}
+
+/* Bestätigung pending */
+function ScreenBestätigungPending() {
+  return (
+    <div className="page">
+      <div className="confirmation-box">
+        <div className="confirmation-icon">⏳</div>
+        <div className="page-title">Buchung eingegangen</div>
+        <p className="page-subtitle" style={{maxWidth:400, margin:'8px auto 0'}}>
+          Deine Subscription wurde gebucht. Ein Customer Care Specialist sendet dir in Kürze eine Bestätigung.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* Bestätigung empfangen */
+function ScreenBestätigungEmpfangen({ subscription }) {
+  return (
+    <div className="page">
+      <div className="confirmation-box">
+        <div className="confirmation-icon">✓</div>
+        <div className="page-title">Subscription bestätigt!</div>
+        <p className="page-subtitle" style={{maxWidth:400, margin:'8px auto 24px'}}>
+          Deine {subscription?.planType}-Subscription ist aktiv. Du kannst jetzt Fahrräder buchen.
+        </p>
+        <StatusBadge status="bestätigt" />
+      </div>
+    </div>
+  );
+}
+
+/* Fahrrad suchen */
+function ReservierenOverlay({ fahrrad, onDone }) {
+  const [phase, setPhase] = React.useState('anfrage'); // anfrage → reserviert
+
+  React.useEffect(() => {
+    const t = setTimeout(() => setPhase('reserviert'), 1800);
+    return () => clearTimeout(t);
+  }, []);
+
+  React.useEffect(() => {
+    if (phase === 'reserviert') {
+      const t = setTimeout(() => onDone(), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
+
+  return (
+    <div className="reservierer-overlay">
+      <div className="reservierer-card">
+        <div className="reservierer-label">System</div>
+        <div className="reservierer-system-badge">
+          <div className="reservierer-dot" />
+          Reservierer
+        </div>
+        {phase === 'anfrage' ? (
+          <>
+            <div className="reservierer-spinner" />
+            <div style={{fontWeight:700, marginBottom:8}}>Anfrage wird verarbeitet …</div>
+            <div style={{fontSize:12, color:'var(--color-text-muted)'}}>
+              Der Reservierer prüft die Verfügbarkeit von<br/>
+              <strong>{fahrrad.typ} {fahrrad.id}</strong>
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{fontSize:40, marginBottom:12}}>✓</div>
+            <div style={{fontWeight:700, marginBottom:8, color:'#1a5c2a'}}>Fahrrad blockiert</div>
+            <div style={{fontSize:12, color:'var(--color-text-muted)'}}>
+              Der Reservierer hat <strong>{fahrrad.typ} {fahrrad.id}</strong><br/>
+              erfolgreich für dich reserviert.
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ScreenFahrradSuche({ fahrräder, setFahrräder, subscription, setScreen, setAktivesFahrrad }) {
+  const [filter, setFilter] = useState('alle');
+  const [reserviereFor, setReservierFor] = useState(null);
+
+  const verfügbare = fahrräder.filter(f => f.status === 'verfügbar');
+  const angezeigt = filter === 'alle' ? fahrräder : fahrräder.filter(f => f.status === filter);
+
+  function auslösenReservierer(id) {
+    const f = fahrräder.find(f => f.id === id);
+    setReservierFor(f);
+  }
+
+  function reservierenAbschließen() {
+    setFahrräder(prev => prev.map(f =>
+      f.id === reserviereFor.id ? { ...f, status: 'blockiert', commuterId: COMMUTER_ID } : f
+    ));
+    setAktivesFahrrad(reserviereFor);
+    setReservierFor(null);
+    setScreen('fahrrad-übernehmen');
+  }
+
+  return (
+    <div className="page">
+      {reserviereFor && (
+        <ReservierenOverlay fahrrad={reserviereFor} onDone={reservierenAbschließen} />
+      )}
+      <div className="page-title">Fahrrad suchen</div>
+      {!subscription && (
+        <div className="info-bar">⚠ Für eine Buchung benötigst du eine aktive Subscription.</div>
+      )}
+      <div className="bike-map">🗺 Karte — Racks mit Standort ({verfügbare.length} verfügbare Fahrräder)</div>
+      <div style={{display:'flex', gap:8, marginBottom:16}}>
+        {['alle','verfügbar','blockiert','ausgeliehen','zurückgegeben'].map(s => (
+          <button key={s} className={`btn btn-sm ${filter===s?'btn-primary':'btn-secondary'}`} onClick={()=>setFilter(s)}>
+            {s}
+          </button>
+        ))}
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Fahrrad-ID</th>
+            <th>Typ</th>
+            <th>Rack mit Standort</th>
+            <th>Status</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+          {angezeigt.map(f => (
+            <tr key={f.id}>
+              <td><strong>{f.id}</strong></td>
+              <td>{f.typ}</td>
+              <td>{f.rack}<br/><span style={{color:'var(--color-text-muted)',fontSize:12}}>{f.standort}</span></td>
+              <td><StatusBadge status={f.status} /></td>
+              <td>
+                {f.status === 'verfügbar' && subscription?.status === 'bestätigt' && (
+                  <button className="btn btn-primary btn-sm" onClick={()=>auslösenReservierer(f.id)}>
+                    Reservieren
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* Fahrrad übernehmen */
+function ScreenFahrradÜbernehmen({ fahrrad, fahrräder, setFahrräder, setScreen, setAktivesFahrrad }) {
+  const aktives = fahrrad || fahrräder.find(f => f.status === 'blockiert' && f.commuterId === COMMUTER_ID);
+
+  function übernehmen() {
+    if (!aktives) return;
+    setFahrräder(prev => prev.map(f =>
+      f.id === aktives.id ? { ...f, status: 'ausgeliehen' } : f
+    ));
+    setScreen('fahrrad-aktiv');
+  }
+
+  if (!aktives) {
+    return (
+      <div className="page">
+        <div className="info-bar">Kein Fahrrad reserviert. <button className="btn-ghost btn" style={{height:'auto'}} onClick={()=>setScreen('fahrrad-suche')}>Fahrrad suchen →</button></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page">
+      <div className="page-title">Fahrrad übernehmen</div>
+      <div className="card" style={{maxWidth:480}}>
+        <div className="card-header">
+          <div>
+            <div className="card-title">{aktives.typ} — {aktives.id}</div>
+            <div className="card-meta">{aktives.rack} · {aktives.standort}</div>
+          </div>
+          <StatusBadge status={aktives.status} />
+        </div>
+        <hr/>
+        <div className="form-group">
+          <label className="form-label">Entsperrcode</label>
+          <input className="form-input" type="text" placeholder="4-stelligen Code eingeben" maxLength={4} />
+          <div style={{fontSize:12, color:'var(--color-text-muted)', marginTop:4}}>Code wurde an die APP gesendet.</div>
+        </div>
+        <div className="card-actions">
+          <button className="btn btn-primary" onClick={übernehmen}>Fahrrad übernehmen</button>
+          <button className="btn btn-secondary" onClick={()=>{
+            setFahrräder(prev => prev.map(f => f.id===aktives.id ? {...f, status:'verfügbar', commuterId:null} : f));
+            setScreen('fahrrad-suche');
+          }}>Reservierung aufheben</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Aktive Fahrt */
+function ScreenFahrradAktiv({ fahrräder, setFahrräder, setScreen }) {
+  const aktives = fahrräder.find(f => f.status === 'ausgeliehen' && f.commuterId === COMMUTER_ID);
+
+  function zurückgeben() {
+    if (!aktives) return;
+    setFahrräder(prev => prev.map(f =>
+      f.id === aktives.id ? { ...f, status: 'zurückgegeben' } : f
+    ));
+    setScreen('fahrrad-rückgabe');
+  }
+
+  if (!aktives) {
+    return <div className="page"><div className="info-bar">Keine aktive Fahrt.</div></div>;
+  }
+
+  return (
+    <div className="page">
+      <div className="page-title">Aktive Fahrt</div>
+      <div className="card" style={{maxWidth:480}}>
+        <div className="card-header">
+          <div>
+            <div className="card-title">{aktives.typ} — {aktives.id}</div>
+            <div className="card-meta">Fahrt läuft …</div>
+          </div>
+          <StatusBadge status={aktives.status} />
+        </div>
+        <div style={{padding:'24px 0', textAlign:'center', fontSize:48}}>🚲</div>
+        <div className="card-actions">
+          <button className="btn btn-primary" onClick={zurückgeben}>Fahrrad zurückgeben</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Fahrrad Rückgabe */
+function ScreenFahrradRückgabe({ fahrräder, setFahrräder, setScreen }) {
+  const zurückgegeben = fahrräder.find(f => f.status === 'zurückgegeben' && f.commuterId === COMMUTER_ID);
+  const [bestätigt, setBestätigt] = useState(false);
+
+  function freigeben() {
+    if (!zurückgegeben) return;
+    setFahrräder(prev => prev.map(f =>
+      f.id === zurückgegeben.id ? { ...f, status: 'verfügbar', commuterId: null } : f
+    ));
+    setBestätigt(true);
+  }
+
+  if (bestätigt) {
+    return (
+      <div className="page">
+        <div className="confirmation-box">
+          <div className="confirmation-icon">✓</div>
+          <div className="page-title">Fahrrad zurückgegeben</div>
+          <p className="page-subtitle" style={{maxWidth:400, margin:'8px auto 24px'}}>
+            Das Fahrrad wurde erfolgreich zurückgegeben und ist wieder verfügbar.
+          </p>
+          <button className="btn btn-primary" onClick={()=>setScreen('home')}>Zurück zur Übersicht</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page">
+      <div className="page-title">Fahrrad zurückgeben</div>
+      <div className="card" style={{maxWidth:480}}>
+        <div className="card-header">
+          <div>
+            <div className="card-title">{zurückgegeben?.typ} — {zurückgegeben?.id}</div>
+            <div className="card-meta">Rückgabe-Standort bestätigen</div>
+          </div>
+          <StatusBadge status="zurückgegeben" />
+        </div>
+        <hr/>
+        <div className="form-group">
+          <label className="form-label">Rack mit Standort</label>
+          <select className="form-select">
+            <option>Rack Hauptbahnhof — Bahnhofsplatz 1</option>
+            <option>Rack Marktplatz — Marktplatz 4</option>
+            <option>Rack Universität — Uni-Allee 12</option>
+          </select>
+        </div>
+        <div className="card-actions">
+          <button className="btn btn-primary" onClick={freigeben}>Rückgabe bestätigen & freigeben</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Meine Fahrten */
+function ScreenMeineFahrten({ fahrräder }) {
+  const meine = fahrräder.filter(f => f.commuterId === COMMUTER_ID || f.commuterId === 'C001');
+  return (
+    <div className="page">
+      <div className="page-title">Meine Fahrten</div>
+      {meine.length === 0
+        ? <div className="info-bar">Noch keine Fahrten vorhanden.</div>
+        : (
+          <table>
+            <thead><tr><th>Fahrrad-ID</th><th>Typ</th><th>Rack mit Standort</th><th>Status</th></tr></thead>
+            <tbody>
+              {meine.map(f=>(
+                <tr key={f.id}>
+                  <td><strong>{f.id}</strong></td>
+                  <td>{f.typ}</td>
+                  <td>{f.rack}</td>
+                  <td><StatusBadge status={f.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )
+      }
+    </div>
+  );
+}
+
+/* ════════════════════════════════
+   CUSTOMER CARE SPECIALIST SCREENS
+════════════════════════════════ */
+
+function ScreenCCSDashboard() {
+  return (
+    <div className="page">
+      <div className="page-title">Customer Care Specialist — Dashboard</div>
+      <div className="grid-3">
+        {[
+          { label: 'Offene Bestätigungen', value: '3', color: 'var(--color-primary)' },
+          { label: 'Aktive Subscriptions', value: '142', color: '#1a5c2a' },
+          { label: 'Fahrräder ausgeliehen', value: '27', color: '#0050a0' },
+        ].map(s => (
+          <div key={s.label} className="card" style={{textAlign:'center'}}>
+            <div style={{fontSize:40, fontWeight:900, color:s.color}}>{s.value}</div>
+            <div className="card-meta" style={{marginTop:4}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ScreenCCSBestätigungen({ subscriptions, setSubscriptions }) {
+  function bestätigen(id) {
+    setSubscriptions(prev => prev.map(s =>
+      s.id === id ? { ...s, status: 'bestätigt' } : s
+    ));
+  }
+  const offene = subscriptions.filter(s => s.status === 'gebucht');
+  const bestätigt = subscriptions.filter(s => s.status === 'bestätigt');
+
+  return (
+    <div className="page">
+      <div className="page-title">Bestätigungen senden</div>
+      <p className="page-subtitle">Als Customer Care Specialist erzeugen und senden Sie Bestätigungen für neue Subscriptions.</p>
+      {offene.length > 0 && (
+        <>
+          <div style={{fontWeight:700, marginBottom:12}}>Offene Bestätigungen ({offene.length})</div>
+          {offene.map(s => (
+            <div key={s.id} className="card" style={{marginBottom:12}}>
+              <div className="card-header">
+                <div>
+                  <div className="card-title">Subscription {s.id} — {s.planType}</div>
+                  <div className="card-meta">Commuter: {s.commuterId} · ab {s.startDate}</div>
+                </div>
+                <StatusBadge status={s.status} />
+              </div>
+              <div className="card-actions">
+                <button className="btn btn-primary btn-sm" onClick={()=>bestätigen(s.id)}>
+                  Bestätigung erzeugen &amp; senden
+                </button>
+              </div>
+            </div>
+          ))}
+          <hr style={{margin:'24px 0'}} />
+        </>
+      )}
+      <div style={{fontWeight:700, marginBottom:12}}>Bestätigte Subscriptions ({bestätigt.length})</div>
+      {bestätigt.map(s => (
+        <div key={s.id} className="card" style={{marginBottom:8}}>
+          <div className="card-header">
+            <div>
+              <div className="card-title">Subscription {s.id} — {s.planType}</div>
+              <div className="card-meta">Commuter: {s.commuterId} · ab {s.startDate}</div>
+            </div>
+            <StatusBadge status={s.status} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ScreenCCSFlotte({ fahrräder, setFahrräder }) {
+  function freigeben(id) {
+    setFahrräder(prev => prev.map(f =>
+      f.id === id ? { ...f, status: 'verfügbar', commuterId: null } : f
+    ));
+  }
+  return (
+    <div className="page">
+      <div className="page-title">Flotte — Alle Fahrräder</div>
+      <table>
+        <thead>
+          <tr><th>Fahrrad-ID</th><th>Typ</th><th>Rack mit Standort</th><th>Status</th><th>Aktion</th></tr>
+        </thead>
+        <tbody>
+          {fahrräder.map(f => (
+            <tr key={f.id}>
+              <td><strong>{f.id}</strong></td>
+              <td>{f.typ}</td>
+              <td>{f.rack}<br/><span style={{color:'var(--color-text-muted)',fontSize:12}}>{f.standort}</span></td>
+              <td><StatusBadge status={f.status} /></td>
+              <td>
+                {f.status === 'zurückgegeben' && (
+                  <button className="btn btn-primary btn-sm" onClick={()=>freigeben(f.id)}>Freigeben</button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ════════════════════════════════
+   APP ROOT
+════════════════════════════════ */
+function App() {
+  const [role, setRole]               = useState('Commuter');
+  const [screen, setScreen]           = useState('home');
+  const [fahrräder, setFahrräder]     = useState(INITIAL_FAHRRÄDER);
+  const [subscriptions, setSubscriptions] = useState(INITIAL_SUBSCRIPTIONS);
+  const [aktivesFahrrad, setAktivesFahrrad] = useState(null);
+
+  const mySubscription = subscriptions.find(s => s.commuterId === COMMUTER_ID || s.commuterId === 'C001');
+
+  function handleRoleChange(r) {
+    setRole(r);
+    setScreen(r === 'Commuter' ? 'home' : 'ccs-dashboard');
+  }
+
+  function renderScreen() {
+    switch(screen) {
+      case 'home':                    return <ScreenHome subscription={mySubscription} setScreen={setScreen} />;
+      case 'subscription':            return <ScreenSubscription subscription={mySubscription} setSubscription={s=>setSubscriptions(prev=>[...prev.filter(x=>x.commuterId!==COMMUTER_ID), s])} setScreen={setScreen} />;
+      case 'bestätigung-pending':     return <ScreenBestätigungPending />;
+      case 'bestätigung-empfangen':   return <ScreenBestätigungEmpfangen subscription={mySubscription} />;
+      case 'fahrrad-suche':           return <ScreenFahrradSuche fahrräder={fahrräder} setFahrräder={setFahrräder} subscription={mySubscription} setScreen={setScreen} setAktivesFahrrad={setAktivesFahrrad} />;
+      case 'fahrrad-übernehmen':      return <ScreenFahrradÜbernehmen fahrrad={aktivesFahrrad} fahrräder={fahrräder} setFahrräder={setFahrräder} setScreen={setScreen} setAktivesFahrrad={setAktivesFahrrad} />;
+      case 'fahrrad-aktiv':           return <ScreenFahrradAktiv fahrräder={fahrräder} setFahrräder={setFahrräder} setScreen={setScreen} />;
+      case 'fahrrad-rückgabe':        return <ScreenFahrradRückgabe fahrräder={fahrräder} setFahrräder={setFahrräder} setScreen={setScreen} />;
+      case 'meine-fahrten':           return <ScreenMeineFahrten fahrräder={fahrräder} />;
+      case 'ccs-dashboard':           return <ScreenCCSDashboard />;
+      case 'ccs-bestätigungen':       return <ScreenCCSBestätigungen subscriptions={subscriptions} setSubscriptions={setSubscriptions} />;
+      case 'ccs-flotte':              return <ScreenCCSFlotte fahrräder={fahrräder} setFahrräder={setFahrräder} />;
+      default: return <div className="page">Screen nicht gefunden: {screen}</div>;
+    }
+  }
+
+  return (
+    <>
+      <Navbar role={role} setRole={handleRoleChange} />
+      <SubNav screen={screen} setScreen={setScreen} role={role} />
+      {renderScreen()}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

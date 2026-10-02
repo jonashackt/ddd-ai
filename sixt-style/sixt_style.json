@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "source": "https://www.sixt.de/",
+    "screenshotResolution": "1440x900",
+    "scaleFactor": 1,
+    "scaleFactorBasis": "1440x900 matches a standard 1x desktop viewport; body text strokes measure ~1px and line-height ~17px, consistent with 14-16px body text at 1x",
+    "capturedAt": "2026-10-02",
+    "notes": [
+      "Font family: custom sans-serif, likely 'SIXT Sans' or a licensed sans; classified visually as geometric/humanist sans-serif — developer must verify exact font from CSS",
+      "The 'Autos anzeigen' CTA in the booking widget reads as #5E2A12 at pixel level — this is the dark hero image bleeding through the semi-transparent widget; confirmed primary orange is #FF5000 from the EINVERSTANDEN button",
+      "Cookie consent modal was visible at capture time; modal overlay colors are included as component entries",
+      "Shadow values are not measurable from a screenshot; entries are omitted — developer must inspect CSS",
+      "Hover/focus/disabled states not visible in static screenshot — not included",
+      "Announcement bar uses a dark brownish-orange (#5E2A12) distinct from the bright primary orange (#FF5000)"
+    ]
+  },
+  "colors": {
+    "roles": {
+      "primary": "#FF5000",
+      "primaryDark": "#5E2A12",
+      "background": "#FFFFFF",
+      "backgroundDark": "#141414",
+      "backgroundSubtle": "#FEF2EB",
+      "surface": "#191919",
+      "textDefault": "#222222",
+      "textMuted": "#5E5E5E",
+      "textOnDark": "#FFFFFF",
+      "textOnPrimary": "#FFFFFF",
+      "border": "#5E5E5E"
+    },
+    "palette": [
+      { "hex": "#FF5000", "role": "primary orange — brand CTA (EINVERSTANDEN button, logo accent)" },
+      { "hex": "#5E2A12", "role": "dark burnt orange — announcement bar, dark widget overlays" },
+      { "hex": "#141414", "role": "navbar background, near-black" },
+      { "hex": "#191919", "role": "dark surface — tabs, sub-nav" },
+      { "hex": "#222222", "role": "body text in light contexts (modal)" },
+      { "hex": "#5E5E5E", "role": "muted text, nav items, input backgrounds in dark context" },
+      { "hex": "#FFFFFF", "role": "white — modal bg, button text, general light background" },
+      { "hex": "#FEF2EB", "role": "warm light tint — booking widget bg, warning/info areas" }
+    ]
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "'SIXT Sans', system-ui, sans-serif",
+      "notes": "Geometric/humanist sans-serif; exact name must be verified from CSS"
+    },
+    "styles": {
+      "navLabel": {
+        "family": "'SIXT Sans', system-ui, sans-serif",
+        "sizePx": 14,
+        "lineHeightPx": 20,
+        "weight": 400,
+        "color": "#5E5E5E"
+      },
+      "navLabelMuted": {
+        "family": "'SIXT Sans', system-ui, sans-serif",
+        "sizePx": 14,
+        "lineHeightPx": 20,
+        "weight": 400,
+        "color": "#464646"
+      },
+      "announcementBar": {
+        "family": "'SIXT Sans', system-ui, sans-serif",
+        "sizePx": 14,
+        "lineHeightPx": 20,
+        "weight": 700,
+        "color": "#FFFFFF"
+      },
+      "modalHeading": {
+        "family": "'SIXT Sans', system-ui, sans-serif",
+        "sizePx": 20,
+        "lineHeightPx": 28,
+        "weight": 700,
+        "color": "#222222",
+        "notes": "Measured from modal 'Cookies und ähnliche Technologien' — heading area spans ~28px"
+      },
+      "modalBody": {
+        "family": "'SIXT Sans', system-ui, sans-serif",
+        "sizePx": 14,
+        "lineHeightPx": 20,
+        "weight": 400,
+        "color": "#222222",
+        "notes": "Text strokes at ~1px, line spacing ~17px measured via vertical edge scan"
+      },
+      "buttonLabel": {
+        "family": "'SIXT Sans', system-ui, sans-serif",
+        "sizePx": 14,
+        "lineHeightPx": 20,
+        "weight": 700,
+        "color": "#FFFFFF"
+      },
+      "labelSmall": {
+        "family": "'SIXT Sans', system-ui, sans-serif",
+        "sizePx": 12,
+        "lineHeightPx": 16,
+        "weight": 400,
+        "color": "#5E5E5E"
+      }
+    }
+  },
+  "spacing": {
+    "baseUnit": 8,
+    "scale": [4, 8, 12, 16, 24, 32, 40, 48, 64],
+    "observed": {
+      "announcementBarHeight": 37,
+      "navbarHeight": 64,
+      "subNavHeight": 40,
+      "buttonHeightPrimary": 44,
+      "buttonPaddingHorizontal": 24,
+      "modalPaddingHorizontal": 32,
+      "cardGap": 16
+    }
+  },
+  "components": {
+    "button.primary": {
+      "background": "#FF5000",
+      "color": "#FFFFFF",
+      "borderRadius": 4,
+      "paddingX": 24,
+      "paddingY": 12,
+      "height": 44,
+      "fontSize": 14,
+      "fontWeight": 700,
+      "border": "none",
+      "notes": "Sampled from 'EINVERSTANDEN' button in cookie modal; solid orange fill, white bold label"
+    },
+    "button.secondary": {
+      "background": "#FFFFFF",
+      "color": "#FF5000",
+      "borderRadius": 4,
+      "paddingX": 24,
+      "paddingY": 12,
+      "height": 44,
+      "fontSize": 14,
+      "fontWeight": 700,
+      "border": "1px solid #FF5000",
+      "notes": "Sampled from 'Ablehnen' button; white background with orange border and orange text"
+    },
+    "button.ghost": {
+      "background": "transparent",
+      "color": "#FF5000",
+      "borderRadius": 4,
+      "paddingX": 16,
+      "paddingY": 12,
+      "height": 44,
+      "fontSize": 14,
+      "fontWeight": 700,
+      "border": "none",
+      "notes": "Sampled from 'Einstellungen' link-style button; no border, orange text only"
+    },
+    "button.tabActive": {
+      "background": "#191919",
+      "color": "#FFFFFF",
+      "borderRadius": 20,
+      "paddingX": 16,
+      "paddingY": 8,
+      "height": 36,
+      "fontSize": 14,
+      "fontWeight": 500,
+      "border": "1px solid #353535",
+      "notes": "Active pill tab ('Autos') — dark fill, white text, rounded pill shape; measured via horizontal edge scan (width ~87px)"
+    },
+    "input.search": {
+      "background": "#5E5E5E",
+      "color": "#FFFFFF",
+      "borderRadius": 4,
+      "paddingX": 16,
+      "paddingY": 12,
+      "height": 44,
+      "fontSize": 14,
+      "border": "none",
+      "notes": "Dark-theme search input inside booking widget; placeholder text in muted white"
+    },
+    "modal": {
+      "background": "#FFFFFF",
+      "borderRadius": 8,
+      "paddingX": 32,
+      "paddingY": 32,
+      "shadow": "not measurable from screenshot — verify in CSS",
+      "notes": "Cookie consent modal; white bg, rounded corners, max-width ~600px"
+    },
+    "infoBar": {
+      "background": "#FEF2EB",
+      "borderLeft": "3px solid #FF5000",
+      "paddingX": 16,
+      "paddingY": 12,
+      "fontSize": 14,
+      "color": "#222222",
+      "notes": "Warning/info bar inside modal ('Ihre Browserversion muss aktualisiert werden'); warm tint bg with orange left accent"
+    },
+    "navbar": {
+      "background": "#141414",
+      "height": 64,
+      "color": "#5E5E5E",
+      "fontSize": 14,
+      "notes": "Main navigation bar; near-black background, muted grey nav items"
+    },
+    "announcementBar": {
+      "background": "#5E2A12",
+      "height": 37,
+      "color": "#FFFFFF",
+      "fontSize": 14,
+      "fontWeight": 700,
+      "notes": "Top-most strip; dark burnt-orange background, bold white text"
+    },
+    "bookingWidget": {
+      "background": "#FEF2EB",
+      "borderRadius": 8,
+      "paddingX": 24,
+      "paddingY": 16,
+      "notes": "Booking form panel overlaid on hero image; warm light-tint background"
+    }
+  }
+}
